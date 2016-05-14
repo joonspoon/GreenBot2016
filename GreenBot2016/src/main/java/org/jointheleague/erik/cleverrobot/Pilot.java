@@ -7,6 +7,8 @@ import org.jointheleague.erik.cleverrobot.sensors.UltraSonicSensors;
 import org.jointheleague.erik.irobot.IRobotAdapter;
 import org.jointheleague.erik.irobot.IRobotInterface;
 
+import java.util.Random;
+
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
 
@@ -41,21 +43,62 @@ public class Pilot extends IRobotAdapter {
         dashboard.log(dashboard.getString(R.string.hello));
     }
 
-    /** This method is executed when the robot first starts up. **/
+    /**
+     * This method is executed when the robot first starts up.
+     **/
     public void initialize() throws ConnectionLostException {
         //what would you like me to do, Clever Human?
 
 
-
     }
 
-    /** This method is called repeatedly. **/
-    public void loop() throws ConnectionLostException {
+    /**
+     * This method is called repeatedly.
+     **/
+    public void loop() throws ConnectionLostException, InterruptedException {
+        driveDirect(80, 80);
+        readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
+        if (isBumpLeft() && isBumpRight()) {
 
+            dashboard.speak(getRandomQuote());
+            //reverse
+            driveDirect(-80, -100);
+            Thread.sleep(500);
+            driveDirect(-100, 100);
+            Thread.sleep(200);
 
+        } else if (isBumpRight()) {
+            dashboard.speak(getRandomQuote());
+            driveDirect(-100, 100);
+            Thread.sleep(500);
+            driveDirect(-100, -50);
+            Thread.sleep(500);
 
+        } else if (isBumpLeft()) {
+            dashboard.speak(getRandomQuote());
+            driveDirect(100, -100);
+            Thread.sleep(500);
+            driveDirect(-50, -100);
+            Thread.sleep(500);
 
+        }
     }
+
+    private String getRandomQuote() {
+        int random = new Random().nextInt(5);
+
+        if (random == 0)
+            return "I do desire that we may be better strangers";
+        if (random == 1)
+            return "thou art a boil, a plague sore";
+        if (random == 2)
+            return "beetle-headed, flap eared knave";
+        if (random == 3)
+            return "lump of foul deformity";
+
+        return "all the infections that the sun sucks up";
+    }
+
 
     /**
      * This method determines where to go next. This is a very simple Tortoise-like
